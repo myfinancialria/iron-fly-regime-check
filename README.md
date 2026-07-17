@@ -16,7 +16,7 @@ the day is too directional to sell premium into.
 
 Data comes from the **Upstox v2 API** (NIFTY / BANKNIFTY / India VIX + NIFTY-50
 breadth) plus a **GIFT NIFTY** pre-market indication for the expected-gap filter.
-The check writes `site/signal.json`, which the static dashboard in `site/` renders —
+The check writes `docs/signal.json`, which the static dashboard in `docs/` renders —
 served free on **GitHub Pages**.
 
 > ⚠️ **Educational / paper-trading tool. Not investment advice.** It reads data and
@@ -112,12 +112,12 @@ python -m ironfly_check confirm            # Stage 2 (after 09:20 IST)
 python -m ironfly_check show               # print the latest signal.json
 ```
 
-Each run writes `site/signal.json` (published) and archives `data/signal_<date>.json`.
+Each run writes `docs/signal.json` (published) and archives `data/signal_<date>.json`.
 
 ### Local preview of the site
 
 ```bash
-cd site && python -m http.server 8000     # open http://localhost:8000
+cd docs && python -m http.server 8000     # open http://localhost:8000
 ```
 
 ---
@@ -158,7 +158,7 @@ ironfly_check/
   signal.py         combine + structure + sizing → signal.json
   selftest.py       offline scenario tests
   cli.py            login / premarket / confirm / selftest / show
-site/
+docs/            (GitHub Pages serves this folder)
   index.html        static dashboard (fetches signal.json; theme-aware)
   signal.json       latest published signal
 deploy/

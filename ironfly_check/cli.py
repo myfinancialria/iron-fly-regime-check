@@ -23,7 +23,7 @@ from .stage1 import score_premarket
 from .stage2 import score_opening
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE_DIR = ROOT / "site"
+SITE_DIR = ROOT / "docs"      # GitHub Pages serves from /docs
 DATA_DIR = ROOT / "data"
 
 C = {"green": "\033[92m", "amber": "\033[93m", "red": "\033[91m",

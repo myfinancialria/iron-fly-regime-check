@@ -26,7 +26,7 @@ if ! "$PYTHON" -m ironfly_check "$STAGE"; then
 fi
 
 # Publish the refreshed signal to GitHub Pages.
-git add site/signal.json
+git add docs/signal.json
 if git diff --cached --quiet; then
   echo "no signal change to commit"
 else
