@@ -1,0 +1,14 @@
+# Iron-fly regime check — Oracle VM cron (times are IST; set the crontab TZ or
+# the VM TZ to Asia/Kolkata). Edit paths to match your checkout.
+#
+#   crontab -e   and paste the two lines below.
+#
+# Stage 1 pre-market at 08:50 IST (Mon–Fri; the check itself skips holidays).
+50 8 * * 1-5 cd /home/ubuntu/iron-fly-regime-check && PYTHON=/usr/bin/python3 deploy/run_check.sh premarket >> deploy/cron.log 2>&1
+# Stage 2 confirmation at 09:21 IST (Mon–Fri), just after the 09:15–09:20 candle.
+21 9 * * 1-5 cd /home/ubuntu/iron-fly-regime-check && PYTHON=/usr/bin/python3 deploy/run_check.sh confirm  >> deploy/cron.log 2>&1
+#
+# NOTE: the Upstox token expires ~03:30 IST daily. Refresh it before 08:50 with:
+#   cd /home/ubuntu/iron-fly-regime-check && python3 -m ironfly_check login <redirect-url>
+# (Upstox has no headless login; automate via your preferred token-refresh method,
+#  or paste the token / a fresh GIFT NIFTY level into .env each morning.)

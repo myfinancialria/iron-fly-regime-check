@@ -1,0 +1,15 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Cached instrument master + per-day signal archive
+data/nse_master_*.json.gz
+data/signal_*.json
+
+# OS
+.DS_Store

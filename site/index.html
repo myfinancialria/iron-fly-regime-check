@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NIFTY Iron-Fly Regime Check</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --border:#2b3446;
+    --text:#e6edf3; --muted:#8b98a9; --green:#2ea043; --amber:#d29922; --red:#e5534b;
+    --neutral:#6e7681; --accent:#4c8dff;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f6f8fa; --panel:#fff; --panel2:#f0f3f7; --border:#d5dbe2;
+      --text:#1c2128; --muted:#5b6570; --neutral:#98a1ab; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 18px 64px}
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:6px}
+  h1{font-size:1.35rem;margin:0;font-weight:650}
+  .sub{color:var(--muted);font-size:.86rem}
+  .updated{color:var(--muted);font-size:.8rem;margin-bottom:22px}
+  .verdict{border-radius:16px;padding:22px 24px;margin-bottom:22px;border:1px solid var(--border);
+    background:var(--panel);position:relative;overflow:hidden}
+  .verdict .grade{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .verdict .decision{font-size:1.7rem;font-weight:750;margin:2px 0 4px;display:flex;align-items:center;gap:12px}
+  .dot{width:16px;height:16px;border-radius:50%;flex:none}
+  .g-green{background:var(--green)} .g-amber{background:var(--amber)}
+  .g-red{background:var(--red)} .g-neutral{background:var(--neutral)}
+  .verdict .msg{color:var(--muted);font-size:.95rem}
+  .bar{position:absolute;left:0;top:0;bottom:0;width:6px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:680px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+  .card h2{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+  .card .status{font-size:1.05rem;font-weight:650;margin-bottom:12px;display:flex;align-items:center;gap:9px}
+  .score{margin-left:auto;font-size:.82rem;color:var(--muted);font-weight:500}
+  ul.cond{list-style:none;margin:0;padding:0}
+  ul.cond li{display:flex;gap:9px;padding:6px 0;border-top:1px solid var(--border);font-size:.87rem}
+  ul.cond li:first-child{border-top:none}
+  .mark{flex:none;width:16px;text-align:center;font-weight:700}
+  .m-green{color:var(--green)} .m-amber{color:var(--amber)}
+  .m-red{color:var(--red)} .m-neutral{color:var(--neutral)}
+  .cond .name{flex:1}
+  .cond .val{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .hardred{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(229,83,75,.12);
+    border:1px solid rgba(229,83,75,.4);font-size:.83rem;color:var(--red)}
+  .info{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:680px){.info{grid-template-columns:1fr}}
+  .kv{font-size:.87rem} .kv b{color:var(--text)} .kv div{padding:3px 0;color:var(--muted)}
+  footer{margin-top:34px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border);padding-top:16px}
+  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.72rem;border:1px solid var(--border);color:var(--muted)}
+  code{background:var(--panel2);padding:1px 6px;border-radius:6px;font-size:.82em}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  .err{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>NIFTY Iron-Fly Regime Check</h1>
+    <span class="sub">two-stage go / no-go filter for a short-premium ATM iron fly</span>
+  </header>
+  <div class="updated" id="updated">Loading latest signal…</div>
+
+  <div class="verdict" id="verdict">
+    <div class="bar g-neutral" id="verdict-bar"></div>
+    <div class="grade" id="v-grade">—</div>
+    <div class="decision"><span class="dot g-neutral" id="v-dot"></span><span id="v-decision">—</span></div>
+    <div class="msg" id="v-msg"></div>
+  </div>
+
+  <div class="grid">
+    <div class="card" id="card-pm">
+      <h2>Stage 1 · Pre-market <span class="pill">08:45–09:10 IST</span></h2>
+      <div class="status"><span class="dot g-neutral" id="pm-dot"></span><span id="pm-status">—</span>
+        <span class="score" id="pm-score"></span></div>
+      <ul class="cond" id="pm-cond"></ul>
+      <div id="pm-hardred"></div>
+    </div>
+    <div class="card" id="card-op">
+      <h2>Stage 2 · 09:20 confirmation <span class="pill">after first 5-min candle</span></h2>
+      <div class="status"><span class="dot g-neutral" id="op-dot"></span><span id="op-status">—</span>
+        <span class="score" id="op-score"></span></div>
+      <ul class="cond" id="op-cond"></ul>
+      <div id="op-hardred"></div>
+    </div>
+  </div>
+
+  <div class="info">
+    <div class="card"><h2>Structure</h2><div class="kv" id="structure"></div></div>
+    <div class="card"><h2>Position sizing</h2><div class="kv" id="sizing"></div></div>
+  </div>
+
+  <footer>
+    The strategy must <b>earn the right to trade</b>: first eliminate incompatible regimes,
+    then optimise strikes, stops and exits. Signal from live Upstox data + GIFT NIFTY.
+    <b>Educational / paper-trading only — not investment advice.</b>
+    <div style="margin-top:8px">Raw: <a href="signal.json">signal.json</a> ·
+      <span id="src"></span></div>
+  </footer>
+</div>
+
+<script>
+const DOT = {GREEN:"g-green",AMBER:"g-amber",RED:"g-red",
+  STANDARD_ENTRY:"g-green",HALF_RISK_ENTRY:"g-amber",WAIT_0930:"g-amber",SKIP:"g-red"};
+const MARK = {green:["✓","m-green"],amber:["!","m-amber"],red:["✗","m-red"],neutral:["·","m-neutral"]};
+
+function condList(el, conds){
+  el.innerHTML = "";
+  (conds||[]).forEach(c=>{
+    const [sym,cls] = MARK[c.color] || MARK.neutral;
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="mark ${cls}">${sym}</span>`+
+      `<span class="name">${c.name}</span><span class="val">${c.detail||""}</span>`;
+    el.appendChild(li);
+  });
+}
+function hardred(el, arr){
+  el.innerHTML = (arr&&arr.length)
+    ? `<div class="hardred"><b>Hard-red:</b> ${arr.join("; ")}</div>` : "";
+}
+function fmtStage(prefix, sc){
+  if(!sc){document.getElementById("card-"+(prefix==="pm"?"pm":"op")).style.opacity=.45;return;}
+  document.getElementById(prefix+"-status").textContent = sc.status;
+  document.getElementById(prefix+"-dot").className = "dot "+(DOT[sc.status]||"g-neutral");
+  document.getElementById(prefix+"-score").textContent = sc.max_score?`${sc.score}/${sc.max_score}`:"";
+  condList(document.getElementById(prefix+"-cond"), sc.conditions);
+  hardred(document.getElementById(prefix+"-hardred"), sc.hard_red);
+}
+function inr(n){return "₹"+Number(n).toLocaleString("en-IN");}
+
+fetch("signal.json?_="+Date.now()).then(r=>r.json()).then(s=>{
+  document.getElementById("updated").innerHTML =
+    `Trade date <b>${s.trade_date}</b> · generated ${s.generated_at} IST · stage: <b>${s.stage}</b>`;
+  document.getElementById("v-grade").textContent = "Grade "+(s.grade||"—")+" · "+(s.stage==="opening"?"09:20 decision":"pre-market");
+  document.getElementById("v-decision").textContent = s.decision;
+  const cls = DOT[(s.opening&&s.opening.status)||(s.premarket&&s.premarket.status)] || "g-neutral";
+  document.getElementById("v-dot").className = "dot "+cls;
+  document.getElementById("verdict-bar").className = "bar "+cls;
+  document.getElementById("v-msg").textContent =
+    s.structure ? `${s.structure.structure} — ${s.structure.legs}` : "";
+
+  fmtStage("pm", s.premarket);
+  fmtStage("op", s.opening);
+
+  const st = s.structure;
+  document.getElementById("structure").innerHTML = st ? `
+    <div><b>Grade ${s.grade}</b> — ${st.structure}</div>
+    <div>${st.legs}</div>
+    <div>${st.hedge_rule}</div>` : "<div>No trade.</div>";
+
+  const z = s.sizing;
+  document.getElementById("sizing").innerHTML = z ? `
+    <div>Capital: <b>${inr(z.capital)}</b></div>
+    <div>Planned risk: <b>${inr(z.planned_risk_rupees)}</b> (${z.planned_risk_pct}% )</div>
+    <div>Absolute daily stop: <b>${inr(z.max_daily_loss_rupees)}</b></div>
+    <div>Lot size: ${z.lot_size}</div>
+    <div style="margin-top:6px">${z.note}</div>` : "<div>No position today.</div>";
+
+  const src = s.premarket && s.premarket.conditions
+    ? "" : "";
+  document.getElementById("src").textContent =
+    "GIFT source: "+((s.premarket&&s.premarket.notes&&s.premarket.notes.join("; "))||"n/a");
+}).catch(e=>{
+  document.getElementById("updated").innerHTML =
+    `<span class="err">No signal published yet.</span> Run <code>python -m ironfly_check premarket</code>.`;
+});
+</script>
+</body>
+</html>

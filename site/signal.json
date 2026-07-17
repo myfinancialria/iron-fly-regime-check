@@ -1,0 +1,130 @@
+{
+  "trade_date": "2026-07-17",
+  "generated_at": "2026-07-17T22:39:18+05:30",
+  "stage": "opening",
+  "premarket": {
+    "stage": "premarket",
+    "status": "GREEN",
+    "action": "Standard risk permitted (confirm again at 09:20)",
+    "score": 6,
+    "max_score": 6,
+    "hard_red": [],
+    "conditions": [
+      {
+        "name": "No major scheduled event",
+        "passed": true,
+        "detail": "clear",
+        "color": "green"
+      },
+      {
+        "name": "Expected gap < 0.40%",
+        "passed": true,
+        "detail": "0.17% (GIFT 24040 vs prev 24000)",
+        "color": "green"
+      },
+      {
+        "name": "India VIX in 11\u201318",
+        "passed": true,
+        "detail": "14.00",
+        "color": "green"
+      },
+      {
+        "name": "VIX 1-day change < +5%",
+        "passed": true,
+        "detail": "+2.9%",
+        "color": "green"
+      },
+      {
+        "name": "Prev day not a trend-extreme",
+        "passed": true,
+        "detail": "range/ATR 0.90, close-loc 0.55",
+        "color": "green"
+      },
+      {
+        "name": "Daily structure neutral",
+        "passed": true,
+        "detail": "0.17% from 20-EMA",
+        "color": "green"
+      }
+    ],
+    "notes": [
+      "DEMO seed signal (synthetic) \u2014 replaced on first live run"
+    ]
+  },
+  "opening": {
+    "stage": "opening",
+    "status": "STANDARD_ENTRY",
+    "action": "Enter standard-risk iron fly",
+    "score": 8,
+    "max_score": 8,
+    "hard_red": [],
+    "conditions": [
+      {
+        "name": "Actual gap < 0.35%",
+        "passed": true,
+        "detail": "0.12%",
+        "color": "green"
+      },
+      {
+        "name": "OR5 ratio 0.10\u20130.30",
+        "passed": true,
+        "detail": "0.23 (OR5 45 pt)",
+        "color": "green"
+      },
+      {
+        "name": "Candle body < 0.45",
+        "passed": true,
+        "detail": "0.11",
+        "color": "green"
+      },
+      {
+        "name": "Close 25\u201375% of range",
+        "passed": true,
+        "detail": "0.56",
+        "color": "green"
+      },
+      {
+        "name": "VWAP distance < 0.10%",
+        "passed": true,
+        "detail": "0.020%",
+        "color": "green"
+      },
+      {
+        "name": "Price inside prev-day range",
+        "passed": true,
+        "detail": "inside prev range",
+        "color": "green"
+      },
+      {
+        "name": "No strong NIFTY\u2013BANKNIFTY alignment",
+        "passed": true,
+        "detail": "NIFTY +0.02%, BANKNIFTY +0.05%",
+        "color": "green"
+      },
+      {
+        "name": "Breadth 18\u201332 advancing",
+        "passed": true,
+        "detail": "25/50 advancing",
+        "color": "green"
+      }
+    ],
+    "notes": []
+  },
+  "decision": "Enter standard-risk iron fly",
+  "grade": "A",
+  "structure": {
+    "grade": "A",
+    "structure": "Standard defined-risk iron fly",
+    "legs": "Sell ATM CE + ATM PE; buy OTM CE + OTM PE hedges",
+    "hedge_rule": "Hedge width \u2248 0.75\u20131.00\u00d7 the ATM straddle premium, rounded to nearest strike",
+    "risk_pct": 0.4
+  },
+  "sizing": {
+    "capital": 2000000.0,
+    "planned_risk_pct": 0.4,
+    "planned_risk_rupees": 8000,
+    "max_daily_loss_rupees": 10000,
+    "lot_size": 65,
+    "note": "Lots = floor(permitted risk / estimated loss-per-lot at strategy stop). Never up-size just because margin is available."
+  }
+}
